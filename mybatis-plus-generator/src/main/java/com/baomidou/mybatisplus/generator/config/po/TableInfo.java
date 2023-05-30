@@ -357,7 +357,8 @@ public class TableInfo {
 
     /**
      * 获取是否生成service接口
-     * @return
+     *
+     * @return 是否生成service接口
      */
     public boolean isServiceInterface() {
         return globalConfig.isServiceInterface();

@@ -41,7 +41,7 @@ public class ConfigBuilder {
     /**
      * 数据库表信息
      */
-    private final List<TableInfo> tableInfoList = new ArrayList<>();
+    private List<TableInfo> tableInfoList;
 
     /**
      * 路径配置信息
@@ -80,9 +80,31 @@ public class ConfigBuilder {
 
     /**
      * 数据查询实例
+     *
      * @since 3.5.3
      */
     private final IDatabaseQuery databaseQuery;
+
+    /**
+     * 在构造器中处理配置
+     *
+     * @param packageConfig  包配置
+     * @param strategyConfig 表配置
+     * @param templateConfig 模板配置
+     * @param globalConfig   全局配置
+     */
+    public ConfigBuilder(@Nullable PackageConfig packageConfig, @Nullable StrategyConfig strategyConfig, @Nullable TemplateConfig templateConfig, @Nullable GlobalConfig globalConfig, @Nullable InjectionConfig injectionConfig) {
+        this.strategyConfig = Optional.ofNullable(strategyConfig).orElseGet(GeneratorBuilder::strategyConfig);
+        this.globalConfig = Optional.ofNullable(globalConfig).orElseGet(GeneratorBuilder::globalConfig);
+        this.templateConfig = Optional.ofNullable(templateConfig).orElseGet(GeneratorBuilder::templateConfig);
+        this.packageConfig = Optional.ofNullable(packageConfig).orElseGet(GeneratorBuilder::packageConfig);
+        this.injectionConfig = Optional.ofNullable(injectionConfig).orElseGet(GeneratorBuilder::injectionConfig);
+        this.pathInfo.putAll(new PathInfoHandler(this.globalConfig, this.templateConfig, this.packageConfig).getPathInfo());
+        // 直接从实体生成业务方法，不需要查询数据库
+        this.databaseQuery = null;
+        this.dataSourceConfig = null;
+        this.tableInfoList = new ArrayList<>();
+    }
 
     /**
      * 在构造器中处理配置
@@ -93,9 +115,7 @@ public class ConfigBuilder {
      * @param templateConfig   模板配置
      * @param globalConfig     全局配置
      */
-    public ConfigBuilder(@Nullable PackageConfig packageConfig, @NotNull DataSourceConfig dataSourceConfig,
-                         @Nullable StrategyConfig strategyConfig, @Nullable TemplateConfig templateConfig,
-                         @Nullable GlobalConfig globalConfig, @Nullable InjectionConfig injectionConfig) {
+    public ConfigBuilder(@Nullable PackageConfig packageConfig, @NotNull DataSourceConfig dataSourceConfig, @Nullable StrategyConfig strategyConfig, @Nullable TemplateConfig templateConfig, @Nullable GlobalConfig globalConfig, @Nullable InjectionConfig injectionConfig) {
         this.dataSourceConfig = dataSourceConfig;
         this.strategyConfig = Optional.ofNullable(strategyConfig).orElseGet(GeneratorBuilder::strategyConfig);
         this.globalConfig = Optional.ofNullable(globalConfig).orElseGet(GeneratorBuilder::globalConfig);
@@ -110,6 +130,7 @@ public class ConfigBuilder {
         } catch (ReflectiveOperationException exception) {
             throw new RuntimeException("创建IDatabaseQuery实例出现错误:", exception);
         }
+        tableInfoList = new ArrayList<>();
     }
 
     /**
@@ -155,6 +176,11 @@ public class ConfigBuilder {
             }
         }
         return tableInfoList;
+    }
+
+    public void setTableInfoList(List<TableInfo> tableInfoList) {
+        this.tableInfoList = tableInfoList;
+        tableInfoList.forEach(TableInfo::processTable);
     }
 
     @NotNull

@@ -70,6 +70,15 @@ public class AutoGenerator {
     }
 
     /**
+     * 直接通过configBuilder来初始化
+     *
+     * @param config 配置信息
+     */
+    public AutoGenerator(ConfigBuilder config) {
+        this.config = config;
+    }
+
+    /**
      * 构造方法
      *
      * @param dataSourceConfig 数据库配置

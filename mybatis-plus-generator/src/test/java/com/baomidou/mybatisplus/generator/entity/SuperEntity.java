@@ -15,9 +15,9 @@
  */
 package com.baomidou.mybatisplus.generator.entity;
 
-import java.io.Serializable;
-
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -31,11 +31,11 @@ import lombok.Data;
 public class SuperEntity implements Serializable {
 
     /**
-	 * serialVersionUID
-	 */
-	private static final long serialVersionUID = -4801865210961587582L;
+     * serialVersionUID
+     */
+    private static final long serialVersionUID = -4801865210961587582L;
 
-	private Long id;
+    private Long id;
     private Boolean deleted;
 
 }
